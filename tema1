@@ -1,0 +1,231 @@
+#include <fstream>
+
+using namespace std;
+
+fstream fin ("poo.in", ios::in);
+fstream fout ("poo.out", ios::out);
+
+int n, m, i, n1, n2, m1, m2;
+
+class vect{
+private:
+    int *v;
+    int maxim, poz;
+    friend class matrice;
+public:
+    vect(int len = 0){
+        v = new int[len + 1];
+        v[0] = len;
+    }
+    int adresa() {
+        return *v;
+    }
+    int &suma() {
+        int s = 0;
+        for (int i = 1; i <= v[0]; ++i) {
+            s += v[i];
+        }
+        return s;
+    }
+    int &operator[] (int poz) {
+        return v[poz];
+    }
+
+    long long &operator* (vect b) {
+        long long s = 0;
+        for (int i = 1; i <= b[0]; ++i) {
+            s += v[i] * b[i];
+        }
+        return s;
+    }
+
+    bool operator== (vect b) {
+        if (this->v[0] != b[0]) {
+            return 0;
+        }
+        for (int i = 1; i <= b[0]; ++i) {
+            if (this->v[i] != b[i]) {
+                return 0;
+            }
+        }
+        return 1;
+    }
+    bool operator!= (vect b) {
+        if (this->v[0] != b[0]) {
+            return 1;
+        }
+        for (int i = 1; i <= b[0]; ++i) {
+            if (this->v[i] != b[i]) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    void max() {
+        maxim = v[1];
+        poz = 1;
+        for (int i = 2; i <= v[0]; ++i) {
+            if (v[i] > maxim) {
+                maxim = v[i];
+                poz = i;
+            }
+        }
+    }
+    void print_maxim() {
+        fout << maxim << ' ' << poz << "\n";
+    }
+
+    friend istream& operator>> (ifstream& in, vect& a) {
+        in >> a;
+        return in;
+    }
+    friend ostream& operator<< (ofstream& out, const vect& a) {
+        out << a << ' ';
+        return out;
+    }
+
+    void read() {
+        for (int i = 1; i <= v[0]; ++i) {
+            fin >> v[i];
+        }
+    }
+
+    void sort(){
+        for (int i = 1; i < v[0]; ++i) {
+            for (int j = i + 1; j <= v[0]; ++j) {
+                if (v[i] > v[j]) {
+                    v[i] ^= v[j] ^= v[i] ^= v[j];
+                }
+            }
+        }
+    }
+
+    void print() {
+        for (int i = 1; i <= v[0]; ++i){
+            fout << v[i] << ' ';
+        }
+        fout << "\n";
+    }
+
+    vect &operator= (vect &b){
+        this->v[0] = b[0];
+        for (int i = 1; i <= b[0]; ++i) {
+            this->v[i] = b[i];
+        }
+    }
+
+    ~vect() {
+        delete []v;
+    }
+};
+
+class matrice{
+private:
+    vect *x;
+    int lenn, lenm;
+public:
+    matrice(int n, int m){
+        x = new vect[n + 1];
+        for (int i = 1; i <= n; ++i) {
+            vect a(m);
+            x[i] = a;
+        }
+        lenn = n;
+        lenm = m;
+    }
+
+    vect &operator[] (int poz) {
+        return x[poz];
+    }
+
+    void read() {
+        for (int i = 1; i <= lenn; ++i) {
+            x[i].read();
+        }
+    }
+
+    void print() {
+        for (int i = 1; i <= lenn; ++i) {
+            x[i].print();
+        }
+    }
+
+    bool verif(vect a, vect b) {
+        for (int i = 1; i <= lenn; ++i) {
+            int aux1, aux2;
+            aux1 = x[i] * a;
+            aux2 = b[i];
+            if (x[i] * a != b[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    matrice &operator+ (matrice b) {
+        matrice c(this->lenn, this->lenm);
+        vect X(lenm), Y(lenm), Z(lenm);
+        for (int i = 1; i <= lenn; ++i) {
+            X = this->x[i];
+            Y = b[i];
+            Z = c[i];
+            for (int j = 1; j <= lenm; ++j) {
+                Z[j] = X[j] + Y[j];
+            }
+            c[i] = Z;
+        }
+        return c;
+    }
+    ~matrice(){
+        delete[] x;
+    }
+};
+
+int main() {
+
+    //operatii pe vector
+
+    /*fin >> n;
+    vect a(n);
+    a.read();
+    a.print();
+    fout << a.suma() << "\n";
+    a.max();
+    a.print_maxim();
+    vect b(n);
+    b = a;
+    a.sort();
+    a.print();
+    a.max();
+    a.print_maxim();
+    b.print();
+    fout << a * b << "\n";*/
+
+    //operatii pe matrice
+
+    /*fin >> n >> m;
+    matrice a(n, m);
+    a.read();
+    matrice b(n, m);
+    b.read();
+    matrice c(n, m);
+    c = a + b;
+    c.print(); */
+
+    fin >> n >> m;
+    matrice a(n, m);
+    a.read();
+    vect x(n);
+    vect y(m);
+    x.read();
+    y.read();
+
+    if (a.verif(x, y) == 1) {
+        fout << "Verifica\n";
+    } else {
+        fout << "Nu verifica\n";
+    }
+
+    return 0;
+}
